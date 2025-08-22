@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System - Members</title>
+    <link rel="icon" type="image/x-icon" th:href="@{/images/icons8-member-100.ico}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<!-- Particles -->
+<div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+</div>
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="logo">📚 LibraryMS</div>
+        <ul class="nav-menu">
+            <li><a th:href="@{/}" class="nav-link">🏠 Home</a></li>
+            <li><a th:href="@{/books}" class="nav-link">📖 Books</a></li>
+            <li><a th:href="@{/members}" class="nav-link active">👥 Members</a></li>
+            <li><a th:href="@{/loans}" class="nav-link">📋 Loans</a></li>
+            <li><a th:href="@{/dashboard}" class="nav-link">📊 Dashboard</a></li>
+        </ul>
+        <button class="mobile-menu">☰</button>
+    </div>
+</nav>
+
+<div class="container">
+    <!-- ជំនួស alert styles ចាស់ជាមួយ enhanced version -->
+    <div th:if="${success}" class="alert alert-success">
+        <div class="icon">✓</div>
+        <div class="alert-content">
+            <div class="alert-title">Success!</div>
+            <div class="alert-description" th:text="${success}"></div>
+        </div>
+        <button class="alert-close" onclick="dismissAlert(this)">×</button>
+        <div class="alert-progress"></div>
+    </div>
+
+    <div th:if="${error}" class="alert alert-error">
+        <div class="icon">!</div>
+        <div class="alert-content">
+            <div class="alert-title">Error!</div>
+            <div class="alert-description" th:text="${error}"></div>
+        </div>
+        <button class="alert-close" onclick="dismissAlert(this)">×</button>
+    </div>
+
+    <div class="btn-add">
+        <h1>👥 Member Management</h1>
+        <a th:href="@{/members/new}" class="btn">Add New Member</a>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="member : ${members}">
+            <td th:text="${member.id}"></td>
+            <td th:text="${member.name}"></td>
+            <td th:text="${member.email}"></td>
+            <td th:text="${member.phone}"></td>
+            <td>
+                <a th:href="@{/members/edit/{id}(id=${member.id})}" class="btn">Edit</a>
+                <a th:href="@{/members/delete/{id}(id=${member.id})}" class="btn btn-secondary"
+                   onclick="return confirm('Are you sure you want to delete this member?')">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script type="text/javascript">
+
+    document.querySelector('.mobile-menu').addEventListener('click', function() {
+        const navMenu = document.querySelector('.nav-menu');
+        navMenu.style.display = navMenu.style.display === 'flex' ? 'none' : 'flex';
+    });
+
+    function dismissAlert(button) {
+        const alert = button.closest('.alert');
+        alert.classList.add('hiding');
+        setTimeout(() => {
+            if (alert.parentNode) {
+                alert.parentNode.removeChild(alert);
+            }
+        }, 400);
+    }
+</script>
+</body>
+</html>

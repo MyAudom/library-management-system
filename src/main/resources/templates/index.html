@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+    <link rel="icon" type="image/x-icon" th:href="@{/images/icons8-home-100.ico}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<!-- Particles -->
+<div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+</div>
+
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="logo">📚 LibraryMS</div>
+        <ul class="nav-menu">
+            <li><a th:href="@{/}" class="nav-link active">🏠 Home</a></li>
+            <li><a th:href="@{/books}" class="nav-link">📖 Books</a></li>
+            <li><a th:href="@{/members}" class="nav-link">👥 Members</a></li>
+            <li><a th:href="@{/loans}" class="nav-link">📋 Loans</a></li>
+            <li><a th:href="@{/dashboard}" class="nav-link">📊 Dashboard</a></li>
+        </ul>
+        <button class="mobile-menu">☰</button>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="hero">
+        <h1>📚 Library Management System</h1>
+        <p>Modern, efficient, and user-friendly library management solution</p>
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-number" id="totalBooks">0</div>
+                <div>Total Books</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="totalMembers">0</div>
+                <div>Total Members</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="activeLoans">0</div>
+                <div>Active Loans</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="doneActiveLoans">0</div>
+                <div>Returned Loans</div> <!-- Updated label for clarity -->
+            </div>
+        </div>
+    </div>
+
+    <section>
+        <div class="actions-container">
+            <h2 class="actions-title">⚡ Quick Actions</h2>
+
+            <div class="actions-grid" style="display: grid; grid-template-rows: repeat(2, 1fr); grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                <div class="action-card" style="grid-row: 1; grid-column: 1;" >
+                    <div class="action-icon">📚</div>
+                    <div class="action-title"><h3>Book Management</h3></div>
+                    <div class="action-desc"><p>Add, edit, and organize your book collection with detailed information including author, ISBN, publication date, and inventory tracking.</p></div>
+                </div>
+
+                <div class="action-card" style="grid-row: 1; grid-column: 2;">
+                    <div class="action-icon">👥</div>
+                    <div class="action-title"><h3>Member Management</h3></div>
+                    <div class="action-desc"><p>Register new members, manage their profiles, track membership status, and maintain comprehensive member records.</p></div>
+                </div>
+
+                <div class="action-card" style="grid-row: 1; grid-column: 3;" >
+                    <div class="action-icon">📋</div>
+                    <div class="action-title"><h3>Loan Book Tracking</h3></div>
+                    <div class="action-desc"><p>Issue books to members, track due dates, manage returns, and monitor overdue items with automated notifications.</p></div>
+                </div>
+
+                <div class="action-card" style="grid-row: 2; grid-column: 1;" >
+                    <div class="action-icon">🔄</div>
+                    <div class="action-title">Return Book</div>
+                    <div class="action-desc"><div class="action-desc"><p>Process book returns quickly and efficiently, ensuring returned items are updated in the system and available for other members.</p></div></div>
+                </div>
+
+                <div class="action-card" style="grid-row: 2; grid-column: 2;" >
+                    <div class="action-icon">🔍</div>
+                    <div class="action-title"><h3>Advanced Search</h3></div>
+                    <div class="action-desc"><p>Powerful search functionality to find books by title, author, ISBN, or any other criteria quickly and efficiently.</p></div>
+                </div>
+
+                <div class="action-card" style="grid-row: 2; grid-column: 3;">
+                    <div class="action-icon">📊</div>
+                    <div class="action-title"><h3>Dashboard Analytics</h3></div>
+                    <div class="action-desc"><p>Real-time statistics and reports on library usage, popular books, member activity, and inventory status.</p></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="history-section" class="container" style="color: white;">
+        <canvas id="historyChart" width="800" height="400"></canvas>
+    </section>
+
+    <div class="cta-section">
+        <h2>Ready to Get Started?</h2>
+        <p>Choose from the options below to begin managing your library efficiently</p>
+        <div class="cta-buttons">
+            <a th:href="@{/books}" class="btn">📖 Manage Books</a>
+            <a th:href="@{/members}" class="btn btn-secondary">👥 Manage Members</a>
+            <a th:href="@{/loans}" class="btn">📋 Manage Loans</a>
+            <a th:href="@{/dashboard}" class="btn btn-secondary">📊 View Dashboard</a>
+        </div>
+    </div>
+</div>
+<footer class="footer">
+    <p>&copy; 2025 Library Management System. All rights team 5.</p>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const API_BASE = '/api/library';
+
+    async function loadStats() {
+        try {
+            const [booksResponse, membersResponse, activeLoansResponse, doneActiveLoansResponse] = await Promise.all([
+                fetch(`${API_BASE}/books`).then(r => r.json()),
+                fetch(`${API_BASE}/members`).then(r => r.json()),
+                fetch(`${API_BASE}/active-loans-count`).then(r => r.json()),
+                fetch(`${API_BASE}/done-active-loans-count`).then(r => r.json())
+            ]);
+
+            document.getElementById('totalBooks').textContent = booksResponse.length;
+            document.getElementById('totalMembers').textContent = membersResponse.length;
+            document.getElementById('activeLoans').textContent = activeLoansResponse;
+            document.getElementById('doneActiveLoans').textContent = doneActiveLoansResponse;
+        } catch (error) {
+            console.error('Could not load stats - backend may not be running:', error);
+            document.getElementById('totalBooks').textContent = '100';
+            document.getElementById('totalMembers').textContent = '50';
+            document.getElementById('activeLoans').textContent = '20';
+            document.getElementById('doneActiveLoans').textContent = '30';
+        }
+    }
+
+    document.querySelector('.mobile-menu').addEventListener('click', function() {
+        const navMenu = document.querySelector('.nav-menu');
+        navMenu.style.display = navMenu.style.display === 'flex' ? 'none' : 'flex';
+    });
+
+    loadStats();
+
+    async function displayWeeklyHistoryChart() {
+        try {
+            // Fetch weekly activity data from the backend API
+            const response = await fetch('/api/history/weekly');
+            if (!response.ok) {
+                throw new Error('Failed to fetch weekly history');
+            }
+            const filteredData = await response.json();
+
+            // Ensure data is sorted by date
+            filteredData.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            // Prepare data for Chart.js
+            const labels = filteredData.map(event => event.date);
+            const datasets = [
+                {
+                    label: 'Books ±',
+                    data: filteredData.map(event => event.totalBooks),
+                    backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2,
+                    borderRadius: 5,
+                    borderSkipped: false,
+                },
+                {
+                    label: 'Members ±',
+                    data: filteredData.map(event => event.totalMembers),
+                    backgroundColor: 'rgba(255, 99, 132, 0.8)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 2,
+                    borderRadius: 5,
+                    borderSkipped: false,
+                },
+                {
+                    label: 'Active Loans ±',
+                    data: filteredData.map(event => event.activeLoans),
+                    backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 2,
+                    borderRadius: 5,
+                    borderSkipped: false,
+                },
+                {
+                    label: 'Returned Loans ±',
+                    data: filteredData.map(event => event.returnedLoans),
+                    backgroundColor: 'rgba(255, 206, 86, 0.8)',
+                    borderColor: 'rgba(255, 206, 86, 1)',
+                    borderWidth: 2,
+                    borderRadius: 5,
+                    borderSkipped: false,
+                }
+            ];
+
+            // Create the column chart
+            const ctx = document.getElementById('historyChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar', // Changed from 'line' to 'bar' for column chart
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: 'white',
+                                font: {
+                                    family: 'Arial, Helvetica, sans-serif',
+                                    size: 14
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: '📊 Weekly Library Activity Trends',
+                            color: 'white',
+                            font: {
+                                family: 'Arial, Helvetica, sans-serif',
+                                size: 30,
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Activities',
+                                color: 'white',
+                                font: {
+                                    family: 'Arial, Helvetica, sans-serif',
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            ticks: {
+                                color: 'white',
+                                stepSize: 1,
+                                precision: 0,
+                                font: {
+                                    family: 'Arial, Helvetica, sans-serif',
+                                    size: 12
+                                }
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date',
+                                color: 'white',
+                                font: {
+                                    family: 'Arial, Helvetica, sans-serif',
+                                    weight: 'bold',
+                                    size: 16
+                                }
+                            },
+                            ticks: {
+                                color: 'white',
+                                font: {
+                                    family: 'Arial, Helvetica, sans-serif',
+                                    size: 12
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error displaying chart:', error);
+            document.getElementById('historyChart').outerHTML = '<p style="color: white;">Error loading chart data from database.</p>';
+        }
+    }
+
+    // Call the function to display the chart on page load
+    displayWeeklyHistoryChart();
+</script>
+</body>
+</html>

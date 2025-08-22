@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System - Loans</title>
+    <link rel="icon" type="image/x-icon" th:href="@{/images/icons8-loan-100.ico}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <!-- Particles -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">📚 LibraryMS</div>
+            <ul class="nav-menu">
+                <li><a th:href="@{/}" class="nav-link">🏠 Home</a></li>
+                <li><a th:href="@{/books}" class="nav-link">📖 Books</a></li>
+                <li><a th:href="@{/members}" class="nav-link">👥 Members</a></li>
+                <li><a th:href="@{/loans}" class="nav-link active">📋 Loans</a></li>
+                <li><a th:href="@{/dashboard}" class="nav-link">📊 Dashboard</a></li>
+            </ul>
+            <button class="mobile-menu">☰</button>
+        </div>
+    </nav>
+
+    <div class="container" style="padding: 10px 0;!important;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>📋 Loan Management</h1>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <form id="searchForm" class="search-form">
+                    <div class="input-wrapper" >
+                        <input type="text" name="memberName" id="memberName" placeholder="Search by member name" class="search-input" style="margin-bottom: 0;!important;width: auto">
+                    </div>
+                    <select name="returnStatus" id="returnStatus" class="search-select" style="width: auto;margin-bottom: 0;!important;">
+                        <option value="all">All</option>
+                        <option value="returned">Returned</option>
+                        <option value="notReturned">Not Returned</option>
+                    </select>
+                    <button type="submit" class="btn search-btn">Search</button>
+                </form>
+                <a th:href="@{/loans/new}" class="btn add-btn">Add New Loan</a>
+            </div>
+        </div>
+
+        <table id="loansTable">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Book</th>
+                <th>Member</th>
+                <th>Loan Date</th>
+                <th>Due Date</th>
+                <th>Return Date</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="loan : ${loans}">
+                <td th:text="${loan.id}"></td>
+                <td th:text="${loan.book.title}"></td>
+                <td th:text="${loan.member.name}"></td>
+                <td th:text="${loan.loanDate}"></td>
+                <td th:text="${loan.dueDate}"></td>
+                <td th:class="${loan.returnDate != null} ? 'returned' : 'not-returned'" th:text="${loan.returnDate != null} ? ${loan.returnDate} : 'Not Returned'"></td>
+                <td>
+                    <a th:if="${loan.returnDate == null}" th:href="@{/loans/return/{id}(id=${loan.id})}" class="btn">Return</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script type="text/javascript">
+
+        // Mobile menu toggle
+        document.querySelector('.mobile-menu').addEventListener('click', function() {
+            const navMenu = document.querySelector('.nav-menu');
+            navMenu.style.display = navMenu.style.display === 'flex' ? 'none' : 'flex';
+        });
+
+        // Search form filtering
+        document.getElementById('searchForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form submission
+            const returnStatus = document.getElementById('returnStatus').value;
+            const searchValue = document.getElementById('memberName').value.trim().toLowerCase();
+            const rows = document.querySelectorAll('#loansTable tbody tr');
+
+            rows.forEach(row => {
+                const returnDateCell = row.querySelector('td:nth-child(6)'); // Return Date column
+                const memberNameCell = row.querySelector('td:nth-child(3)'); // Member Name column
+                const bookTitleCell = row.querySelector('td:nth-child(2)'); // Book Title column
+                const isReturned = returnDateCell.classList.contains('returned');
+                const memberNameText = memberNameCell.textContent.toLowerCase();
+                const bookTitleText = bookTitleCell.textContent.toLowerCase();
+
+                const matchesStatus = returnStatus === 'all' ||
+                    (returnStatus === 'returned' && isReturned) ||
+                    (returnStatus === 'notReturned' && !isReturned);
+
+                const matchesSearch = searchValue === '' ||
+                    memberNameText.includes(searchValue) ||
+                    bookTitleText.includes(searchValue);
+
+                row.style.display = matchesStatus && matchesSearch ? '' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>

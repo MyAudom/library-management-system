@@ -1,0 +1,104 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Loan</title>
+    <link rel="icon" type="image/x-icon" th:href="@{/images/icons8-loan-100.ico}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <!-- Particles -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">📚 LibraryMS</div>
+            <ul class="nav-menu">
+                <li><a th:href="@{/}" class="nav-link">🏠 Home</a></li>
+                <li><a th:href="@{/books}" class="nav-link ">📖 Books</a></li>
+                <li><a th:href="@{/members}" class="nav-link">👥 Members</a></li>
+                <li><a th:href="@{/loans}" class="nav-link active">📋 Loans</a></li>
+                <li><a th:href="@{/dashboard}" class="nav-link">📊 Dashboard</a></li>
+            </ul>
+            <button class="mobile-menu">☰</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="hero">
+            <h1>Add New Loan</h1>
+            <p>Name the person borrowing the book for safekeeping.</p>
+        </div>
+        <form th:object="${loan}" th:action="@{/loans}" method="post">
+            <label>Book:</label>
+            <select name="bookId" required>
+                <option th:each="book : ${books}" th:value="${book.id}" th:text="${book.title}"></option>
+            </select><br/>
+            <label>Member:</label>
+            <select name="memberId" required>
+                <option th:each="member : ${members}" th:value="${member.id}" th:text="${member.name}"></option>
+            </select><br/>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a th:href="@{/loans}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <footer class="footer">
+        <p>&copy; 2025 Library Management System. All rights team 5.</p>
+    </footer>
+    <script>
+        document.querySelector('.mobile-menu').addEventListener('click', function() {
+            const navMenu = document.querySelector('.nav-menu');
+            navMenu.style.display = navMenu.style.display === 'flex' ? 'none' : 'flex';
+        });
+    </script>
+</body>
+</html>

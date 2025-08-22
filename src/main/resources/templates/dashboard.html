@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+    <link rel="icon" type="image/x-icon" th:href="@{/images/icons8-dashboard-50.ico}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <!-- Particles -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">📚 LibraryMS</div>
+            <ul class="nav-menu">
+                <li><a th:href="@{/}" class="nav-link">🏠 Home</a></li>
+                <li><a th:href="@{/books}" class="nav-link">📖 Books</a></li>
+                <li><a th:href="@{/members}" class="nav-link">👥 Members</a></li>
+                <li><a th:href="@{/loans}" class="nav-link">📋 Loans</a></li>
+                <li><a th:href="@{/dashboard}" class="nav-link active">📊 Dashboard</a></li>
+            </ul>
+            <button class="mobile-menu">☰</button>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="hero">
+            <h1>📊 Library Dashboard</h1>
+            <p>Real-time insights into your library's performance</p>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalBooks">0</div>
+                    <div>Total Books</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="totalMembers">0</div>
+                    <div>Total Members</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="activeLoans">0</div>
+                    <div>Active Loans</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="doneActiveLoans">0</div>
+                    <div>Returned Loans</div> <!-- Updated label for clarity -->
+                </div>
+            </div>
+        </div>
+
+        <h2 class="actions-title" style="display: flex; justify-content: center; align-items: center;">👥 My Teams 5</h2>
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <img th:src="@{/images/HengAudom.png}" alt="Heng Audom" style="width: 150px; height: 150px; border-radius: 20%;">
+                </div>
+                <h3>Heng Audom</h3>
+                <p>Effortlessly manage your book collection with tools to add, edit, and organize books, including details like author, ISBN, publication date, and inventory tracking.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <img th:src="@{/images/LamSreyNoch.jpg}" alt="Lam SreyNoch" style="width: 150px; height: 150px; border-radius: 20%;">
+                </div>
+                <h3>Lam SreyNoch</h3>
+                <p>Enhance book loan management by registering new loans, monitoring loan status, managing borrower profiles, and maintaining detailed loan records.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <img th:src="@{/images/ChorkNeangpy.jpg}" alt="Chork Neangpy" style="width: 150px; height: 150px; border-radius: 20%;">
+                </div>
+                <h3>Chork Neangpy</h3>
+                <p>Add new books to your collection with ease, including details like title, author, ISBN, and publication date, while efficiently managing book inventory.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <img th:src="@{/images/HoeurmChamrong.jpg}" alt="Hoeurm Chamrong" style="width: 150px; height: 150px; border-radius: 20%;">
+                </div>
+                <h3>Hoeurm Chamrong</h3>
+                <p>Access the easy-to-use home page & dashboard to track book inventory, track loaned books, and view key library metrics at a glance.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <img th:src="@{/images/DySamnang.jpg}" alt="Dy Samnang" style="width: 150px; height: 150px; border-radius: 20%;">
+                </div>
+                <h3>Dy Samnang</h3>
+                <p>Easily add new members to the library system, capturing their details to manage profiles, track activity, and monitor membership status.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <img th:src="@{/images/HengAudom.png}" alt="Heng Audom" style="width: 150px; height: 150px; border-radius: 20%;">
+                </div>
+                <h3>Heng Audom</h3>
+                <p>Effortlessly organize and manage your website content with real-time updates, ensuring a seamless user experience for administrators and visitors.</p>
+            </div>
+        </div>
+    </div>
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 LibraryMS - Next Generation Library Management System | Team 5</p>
+    </footer>
+    <script>
+        const API_BASE = '/api/library';
+
+        async function loadStats() {
+            try {
+                const [booksResponse, membersResponse, activeLoansResponse, doneActiveLoansResponse] = await Promise.all([
+                    fetch(`${API_BASE}/books`).then(r => r.json()),
+                    fetch(`${API_BASE}/members`).then(r => r.json()),
+                    fetch(`${API_BASE}/active-loans-count`).then(r => r.json()),
+                    fetch(`${API_BASE}/done-active-loans-count`).then(r => r.json())
+                ]);
+
+                document.getElementById('totalBooks').textContent = booksResponse.length;
+                document.getElementById('totalMembers').textContent = membersResponse.length;
+                document.getElementById('activeLoans').textContent = activeLoansResponse;
+                document.getElementById('doneActiveLoans').textContent = doneActiveLoansResponse;
+            } catch (error) {
+                console.error('Could not load stats - backend may not be running:', error);
+                document.getElementById('totalBooks').textContent = '100';
+                document.getElementById('totalMembers').textContent = '50';
+                document.getElementById('activeLoans').textContent = '20';
+                document.getElementById('doneActiveLoans').textContent = '30';
+            }
+        }
+
+        document.querySelector('.mobile-menu').addEventListener('click', function() {
+            const navMenu = document.querySelector('.nav-menu');
+            navMenu.style.display = navMenu.style.display === 'flex' ? 'none' : 'flex';
+        });
+
+        loadStats();
+    </script>
+</body>
+</html>

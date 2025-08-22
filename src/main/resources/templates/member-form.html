@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${member.id} ? 'Edit Member' : 'Add New Member'">Member Form</title>
+    <link rel="icon" type="image/x-icon" th:href="@{/images/icons8-member-100.ico}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <!-- Particles -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">📚 LibraryMS</div>
+            <ul class="nav-menu">
+                <li><a th:href="@{/}" class="nav-link">🏠 Home</a></li>
+                <li><a th:href="@{/books}" class="nav-link">📖 Books</a></li>
+                <li><a th:href="@{/members}" class="nav-link active">👥 Members</a></li>
+                <li><a th:href="@{/loans}" class="nav-link">📋 Loans</a></li>
+                <li><a th:href="@{/dashboard}" class="nav-link">📊 Dashboard</a></li>
+            </ul>
+            <button class="mobile-menu">☰</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="hero">
+            <h1 th:text="${member.id} ? 'Edit Member' : 'Add New Member'">Member Form</h1>
+            <p>Fill in the details to manage member information</p>
+        </div>
+
+        <form th:action="@{/members/save}" th:object="${member}" method="post" >
+            <input type="hidden" th:field="*{id}"/>
+            <div>
+                <label for="name">Name:</label>
+                <input type="text" th:field="*{name}" id="name" required/>
+            </div>
+            <div>
+                <label for="email">Email:</label>
+                <input type="text" th:field="*{email}" id="email" required/>
+            </div>
+            <div>
+                <label for="phone">Phone:</label>
+                <input type="text" th:field="*{phone}" id="phone"/>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Member</button>
+            <a th:href="@{/members}" class="btn btn-secondary">Cancel</a>
+        </form>
+
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 Library Management System. All rights team 5.</p>
+    </footer>
+
+    <script type="text/javascript">
+
+        document.querySelector('.mobile-menu').addEventListener('click', function() {
+            const navMenu = document.querySelector('.nav-menu');
+            navMenu.classList.toggle('active');
+        });
+    </script>
+</body>
+</html>
